@@ -1,7 +1,7 @@
 {
-  "name": "mcp-demo",
+  "name": "git-mcp-server",
   "version": "1.0.0",
-  "description": "MCP Demo Server",
+  "description": "Git MCP Server",
   "type": "module",
   "main": "build/index.js",
   "scripts": {
@@ -10,7 +10,7 @@
     "dev": "tsc --watch"
   },
   "keywords": [],
-  "author": "",
+  "author": "lens",
   "license": "ISC",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.6.0",
