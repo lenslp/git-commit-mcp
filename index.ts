@@ -76,6 +76,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
                         },
                         scope: { type: "string", description: "改动范围 (可选，如: ui, api, db)" },
                         message: { type: "string", description: "提交说明信息 (支持中文)" },
+                        push: { type: "boolean", description: "提交成功后是否自动执行 git push (可选)" },
                     },
                     required: ["type", "message"],
                 },
@@ -162,10 +163,22 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                 const type = (args as any).type;
                 const scope = (args as any).scope;
                 const message = (args as any).message;
+                const push = (args as any).push;
                 const fullMessage = scope ? `${type}(${scope}): ${message}` : `${type}: ${message}`;
                 const result = await localGit.commit(fullMessage);
+
+                let pushResult = "";
+                if (push) {
+                    try {
+                        const pushOutput = await localGit.push();
+                        pushResult = `\nPush successful: ${JSON.stringify(pushOutput)}`;
+                    } catch (pushError: any) {
+                        pushResult = `\nPush failed: ${pushError.message}`;
+                    }
+                }
+
                 return {
-                    content: [{ type: "text", text: `Commit successful: ${result.commit}\nSummary: ${JSON.stringify(result.summary)}` }],
+                    content: [{ type: "text", text: `Commit successful: ${result.commit}\nSummary: ${JSON.stringify(result.summary)}${pushResult}` }],
                 };
             }
 
