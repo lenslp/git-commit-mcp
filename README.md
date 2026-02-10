@@ -18,9 +18,10 @@ Stages specific files or all changes.
   - `files` (string[]): List of files to add. Use `["."]` for all changes.
 
 ### 4. `git_commit`
-Records changes to the repository with a provided message.
+Records changes to the repository with a provided message and a conventional prefix.
 - **Arguments**:
-  - `message` (string): The commit message.
+  - `type` (string): The type of change (e.g., `feat`, `fix`, `style`, `refactor`).
+  - `message` (string): The commit message (the prefix will be added automatically).
 
 ### 5. `git_log`
 Shows the recent commit history.

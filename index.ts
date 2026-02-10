@@ -68,14 +68,19 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
             },
             {
                 name: "git_commit",
-                description: "Record changes to the repository",
+                description: "Record changes to the repository with a prefix (feat, fix, style, etc.)",
                 inputSchema: {
                     type: "object",
                     properties: {
                         repoPath: { type: "string", description: "Path to the git repository" },
-                        message: { type: "string", description: "The commit message" },
+                        type: {
+                            type: "string",
+                            enum: ["feat", "fix", "style", "refactor", "docs", "chore", "test"],
+                            description: "The type of change (e.g., feat, fix, style)"
+                        },
+                        message: { type: "string", description: "The commit message (without prefix)" },
                     },
-                    required: ["message"],
+                    required: ["type", "message"],
                 },
             },
             {
@@ -127,8 +132,10 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             }
 
             case "git_commit": {
+                const type = (args as any).type;
                 const message = (args as any).message;
-                const result = await localGit.commit(message);
+                const fullMessage = `${type}: ${message}`;
+                const result = await localGit.commit(fullMessage);
                 return {
                     content: [{ type: "text", text: `Commit successful: ${result.commit}\nSummary: ${JSON.stringify(result.summary)}` }],
                 };
