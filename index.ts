@@ -31,87 +31,87 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         tools: [
             {
                 name: "git_status",
-                description: "Show the working tree status",
+                description: "查看工作区状态 (git status)",
                 inputSchema: {
                     type: "object",
                     properties: {
-                        repoPath: { type: "string", description: "Path to the git repository" },
+                        repoPath: { type: "string", description: "仓库本地路径 (可选)" },
                     },
                 },
             },
             {
                 name: "git_diff",
-                description: "Show changes in the working directory or staged area",
+                description: "查看代码改动对比 (git diff)",
                 inputSchema: {
                     type: "object",
                     properties: {
-                        repoPath: { type: "string", description: "Path to the git repository" },
-                        staged: { type: "boolean", description: "Show diff of staged changes" },
+                        repoPath: { type: "string", description: "仓库本地路径 (可选)" },
+                        staged: { type: "boolean", description: "是否查看已暂存区的改动 (git diff --staged)" },
                     },
                 },
             },
             {
                 name: "git_add",
-                description: "Add file contents to the index",
+                description: "添加文件到暂存区 (git add)",
                 inputSchema: {
                     type: "object",
                     properties: {
-                        repoPath: { type: "string", description: "Path to the git repository" },
-                        files: { type: "array", items: { type: "string" }, description: "Files to add. Use ['.'] for all." },
+                        repoPath: { type: "string", description: "仓库本地路径 (可选)" },
+                        files: { type: "array", items: { type: "string" }, description: "文件路径列表，使用 ['.'] 代表全部" },
                     },
                     required: ["files"],
                 },
             },
             {
                 name: "git_commit",
-                description: "Record changes to the repository with a prefix (feat, fix, style, etc.) and optional scope",
+                description: "记录代码提交 (git commit)，支持规范化的前缀和中文消息",
                 inputSchema: {
                     type: "object",
                     properties: {
-                        repoPath: { type: "string", description: "Path to the git repository" },
+                        repoPath: { type: "string", description: "仓库本地路径 (可选)" },
                         type: {
                             type: "string",
                             enum: ["feat", "fix", "style", "refactor", "docs", "chore", "test"],
-                            description: "The type of change (e.g., feat, fix, style)"
+                            description: "提交类型 (如: feat-功能, fix-修复, style-样式)"
                         },
-                        scope: { type: "string", description: "Optional scope for the change (e.g., ui, api)" },
-                        message: { type: "string", description: "The commit message (without prefix)" },
+                        scope: { type: "string", description: "改动范围 (可选，如: ui, api, db)" },
+                        message: { type: "string", description: "提交说明信息 (支持中文)" },
                     },
                     required: ["type", "message"],
                 },
             },
             {
                 name: "git_push",
-                description: "Update remote refs along with associated objects",
+                description: "推送代码到远程仓库 (git push)",
                 inputSchema: {
                     type: "object",
                     properties: {
-                        repoPath: { type: "string", description: "Path to the git repository" },
-                        remote: { type: "string", description: "Remote repository name (default: origin)" },
-                        branch: { type: "string", description: "Branch name" },
+                        repoPath: { type: "string", description: "仓库本地路径 (可选)" },
+                        remote: { type: "string", description: "远程仓库名 (默认为 origin)" },
+                        branch: { type: "string", description: "分支名" },
                     },
                 },
             },
             {
                 name: "git_pull",
-                description: "Fetch from and integrate with another repository or a local branch",
+                description: "从远程仓库拉取更新 (git pull)",
                 inputSchema: {
                     type: "object",
                     properties: {
-                        repoPath: { type: "string", description: "Path to the git repository" },
-                        remote: { type: "string", description: "Remote repository name (default: origin)" },
-                        branch: { type: "string", description: "Branch name" },
+                        repoPath: { type: "string", description: "仓库本地路径 (可选)" },
+                        remote: { type: "string", description: "远程仓库名 (默认为 origin)" },
+                        branch: { type: "string", description: "分支名" },
                     },
                 },
             },
             {
                 name: "git_log",
-                description: "Show commit logs (useful for learning project commit style)",
+                description: "查看提交历史日志 (git log)",
                 inputSchema: {
                     type: "object",
                     properties: {
-                        repoPath: { type: "string", description: "Path to the git repository" },
-                        count: { type: "number", description: "Number of commits to show", default: 5 },
+                        repoPath: { type: "string", description: "仓库本地路径 (可选)" },
+                        count: { type: "number", description: "显示的提交条数", default: 5 },
                     },
                 },
             },
