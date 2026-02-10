@@ -4,11 +4,7 @@ import {
     CallToolRequestSchema,
     ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
-import { simpleGit, SimpleGit } from "simple-git";
-import * as path from "path";
-
-// Initialize simple-git
-const git: SimpleGit = simpleGit();
+import { simpleGit } from "simple-git";
 
 const server = new Server(
     {
@@ -68,7 +64,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
             },
             {
                 name: "git_commit",
-                description: "Record changes to the repository with a prefix (feat, fix, style, etc.)",
+                description: "Record changes to the repository with a prefix (feat, fix, style, etc.) and optional scope",
                 inputSchema: {
                     type: "object",
                     properties: {
@@ -78,9 +74,34 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
                             enum: ["feat", "fix", "style", "refactor", "docs", "chore", "test"],
                             description: "The type of change (e.g., feat, fix, style)"
                         },
+                        scope: { type: "string", description: "Optional scope for the change (e.g., ui, api)" },
                         message: { type: "string", description: "The commit message (without prefix)" },
                     },
                     required: ["type", "message"],
+                },
+            },
+            {
+                name: "git_push",
+                description: "Update remote refs along with associated objects",
+                inputSchema: {
+                    type: "object",
+                    properties: {
+                        repoPath: { type: "string", description: "Path to the git repository" },
+                        remote: { type: "string", description: "Remote repository name (default: origin)" },
+                        branch: { type: "string", description: "Branch name" },
+                    },
+                },
+            },
+            {
+                name: "git_pull",
+                description: "Fetch from and integrate with another repository or a local branch",
+                inputSchema: {
+                    type: "object",
+                    properties: {
+                        repoPath: { type: "string", description: "Path to the git repository" },
+                        remote: { type: "string", description: "Remote repository name (default: origin)" },
+                        branch: { type: "string", description: "Branch name" },
+                    },
                 },
             },
             {
@@ -107,6 +128,12 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     const localGit = simpleGit(repoPath);
 
     try {
+        // Validation: Verify if the directory is a git repository
+        const isRepo = await localGit.checkIsRepo();
+        if (!isRepo) {
+            throw new Error(`Directory "${repoPath}" is not a valid git repository.`);
+        }
+
         switch (name) {
             case "git_status": {
                 const status = await localGit.status();
@@ -133,11 +160,30 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
             case "git_commit": {
                 const type = (args as any).type;
+                const scope = (args as any).scope;
                 const message = (args as any).message;
-                const fullMessage = `${type}: ${message}`;
+                const fullMessage = scope ? `${type}(${scope}): ${message}` : `${type}: ${message}`;
                 const result = await localGit.commit(fullMessage);
                 return {
                     content: [{ type: "text", text: `Commit successful: ${result.commit}\nSummary: ${JSON.stringify(result.summary)}` }],
+                };
+            }
+
+            case "git_push": {
+                const remote = (args as any).remote || "origin";
+                const branch = (args as any).branch;
+                const result = await localGit.push(remote, branch);
+                return {
+                    content: [{ type: "text", text: `Push successful: ${JSON.stringify(result)}` }],
+                };
+            }
+
+            case "git_pull": {
+                const remote = (args as any).remote || "origin";
+                const branch = (args as any).branch;
+                const result = await localGit.pull(remote, branch);
+                return {
+                    content: [{ type: "text", text: `Pull successful: ${JSON.stringify(result.summary)}` }],
                 };
             }
 

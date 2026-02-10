@@ -18,12 +18,25 @@ Stages specific files or all changes.
   - `files` (string[]): List of files to add. Use `["."]` for all changes.
 
 ### 4. `git_commit`
-Records changes to the repository with a provided message and a conventional prefix.
+Records changes to the repository with a provided message, a conventional prefix, and an optional scope.
 - **Arguments**:
-  - `type` (string): The type of change (e.g., `feat`, `fix`, `style`, `refactor`).
-  - `message` (string): The commit message (the prefix will be added automatically).
+  - `type` (string): The type of change (e.g., `feat`, `fix`, `style`).
+  - `scope` (string, optional): The scope of the change (e.g., `ui`, `core`).
+  - `message` (string): The commit message.
 
-### 5. `git_log`
+### 5. `git_push`
+Updates remote refs.
+- **Arguments**:
+  - `remote` (string, optional): Default is `origin`.
+  - `branch` (string, optional): The branch to push.
+
+### 6. `git_pull`
+Fetches from and integrates with another repository or local branch.
+- **Arguments**:
+  - `remote` (string, optional): Default is `origin`.
+  - `branch` (string, optional): The branch to pull.
+
+### 7. `git_log`
 Shows the recent commit history.
 - **Efficiency Hint**: AI uses this to learn the project's commit message style (e.g., Emoji, prefix, tone).
 
